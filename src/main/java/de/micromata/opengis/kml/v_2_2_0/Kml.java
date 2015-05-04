@@ -180,6 +180,7 @@ public class Kml implements Cloneable
     private transient JAXBContext jc = null;
     private transient Marshaller m = null;
     private transient int missingNameCounter = (1);
+	private transient NameSpaceBeautyfier nsb;
     private final static String SCHEMA_LOCATION = "src/main/resources/schema/ogckml/ogckml22.xsd";
 
     public Kml() {
@@ -583,8 +584,30 @@ public class Kml implements Cloneable
         this.setFeature(feature);
         return this;
     }
+    
+    /**
+     * fluent setter
+     * @see #setNameSpaceBeautyfier(NameSpaceBeautyfier)
+     * 
+     * @param nameSpaceBeautyfier
+     *     required parameter
+     */
+    public Kml withNamespaceBeautyfier(final NameSpaceBeautyfier nameSpaceBeautyfier) {
+        this.setNameSpaceBeautyfier(nameSpaceBeautyfier);
+        return this;
+    }
 
     /**
+     * Set a modified {@link NameSpaceBeautyfier}
+     * @param nameSpaceBeautyfier
+     */
+    
+    public void setNameSpaceBeautyfier(NameSpaceBeautyfier nameSpaceBeautyfier) {
+		this.nsb=nameSpaceBeautyfier;
+		
+	}
+
+	/**
      * fluent setter
      * @see #setKmlSimpleExtension(List<Object>)
      * 
@@ -639,10 +662,19 @@ public class Kml implements Cloneable
         if (m == null) {
             m = this.getJaxbContext().createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            m.setProperty("com.sun.xml.bind.namespacePrefixMapper", new Kml.NameSpaceBeautyfier());
+            m.setProperty("com.sun.xml.bind.namespacePrefixMapper", getNameSpaceBeautyfier());
         }
         return m;
     }
+    
+    private NameSpaceBeautyfier getNameSpaceBeautyfier()
+            throws JAXBException
+        {
+            if (nsb == null) {
+               nsb=new Kml.NameSpaceBeautyfier();
+            }
+            return nsb;
+        }
 
     /**
      * Internal method
@@ -941,7 +973,7 @@ public class Kml implements Cloneable
         return copy;
     }
 
-    private final static class NameSpaceBeautyfier
+    public static class NameSpaceBeautyfier
         extends NamespacePrefixMapper
     {
 
